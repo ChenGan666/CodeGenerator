@@ -1,0 +1,48 @@
+{
+  "TemplateList": {
+    "Entity": {
+      "onlyTpl": true,
+      "Projects": [
+        "_company_._project_.Entity"
+      ]
+    },
+    "DAL": {
+      "onlyTpl": true,
+      "Projects": [
+        "_company_._project_.DAL.{Database}",
+        "_company_._project_.DAL"
+      ]
+    },
+    "BLL": {
+      "onlyTpl": true,
+      "Projects": [
+        "_company_._project_.BLL"
+      ]
+    },
+    "All": {
+      "onlyTpl": false,
+      "Projects": [
+        "_company_._project_.AdminWeb",
+        "_company_._project_.AutoJob",
+        "_company_._project_.BLL",
+        "_company_._project_.ConsoleDemo",
+        "_company_._project_.DAL",
+        "_company_._project_.DAL.{Database}",
+        "_company_._project_.Demo",
+        "_company_._project_.Entity",
+        "_company_._project_.Service",
+        "_company_._project_.Web",
+        "FJData.Utils.Core",
+        ".gitattributes",
+        ".gitignore",
+        "_project_.sln"
+      ]
+    }
+  },
+  "IgnoredTable": [
+    "log_level",
+    "log_record",
+    "log_type",
+    "log_type_class"
+  ]
+}
