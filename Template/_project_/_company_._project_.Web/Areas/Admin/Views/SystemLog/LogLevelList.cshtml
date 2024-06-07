@@ -1,0 +1,183 @@
+﻿@{
+    int pageIndex = ViewBag.PageIndex;
+    int pageSize = ViewBag.PageSize;
+    int pageTotal = ViewBag.PageTotal;
+    int total = ViewBag.Total;
+    string keyword = ViewBag.Keyword;
+    string pageTitle = ViewBag.PageTitle;
+    var LogLevelList = ViewBag.LogLevelList as List<LogLevel>;
+   
+
+   
+}
+@functions {
+    public string IsDisabled()
+    {
+        if (!UserServiceHelper.CheckUserPermission("SystemLog/LogLevelStatus"))
+        {
+            return "disabled='disabled'";
+        }
+        return "";
+    }
+}
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>   @pageTitle </legend>
+</fieldset>
+
+<div class="layui-row layui-form">
+    <button class="layui-btn" style="margin-right:50px;" onclick="AddClickEvent();"><i class="layui-icon"></i>增加</button>
+   
+
+ 
+    <div class="layui-input-inline" style="width: 300px;">
+        <input type="text" name="keyword" value="@keyword" class="layui-input" placeholder="搜索日记等级">
+    </div>
+    <button class="layui-btn js-result-search">搜索</button>
+</div>
+
+<div class="layui-form">
+    <table class="layui-table">
+        <colgroup>
+            <col width="142">
+            <col width="142">
+            <col width="300">
+            <col width="400">
+            <col width="73">
+            <col width="280">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>名称</th>
+                <th>描述</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in LogLevelList)
+            {
+                <tr data-Id="@l.Id">
+                    <td>@l.LevelName</td>
+                    <td>@l.LevelRemarks</td>
+                    <td>@l.CreateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <input @IsDisabled() type="checkbox" name="switch" lay-text="开启|停用" lay-skin="switch" lay-filter="status" @(l.Status ? "checked" : "")>
+                    </td>
+                    <td>
+                        <button class="layui-btn layui-btn layui-btn-xs" onclick="EditClickEvent(this);"><i class="layui-icon">&#xe642;</i>编辑</button>
+
+
+                        <button class="layui-btn-danger layui-btn layui-btn-xs" onclick="member_del(this)"><i class="layui-icon">&#xe640;</i>删除</button>
+                    </td>
+                </tr>
+            }
+            @if (LogLevelList.Count == 0)
+            {
+                <tr>
+                    <td colspan="6">暂无数据</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div id="pageId" class="pagination"></div>
+</div>
+
+@section Js{
+    <script>
+ 
+    var laypage = layui.laypage;
+    var pageIndex = @pageIndex;
+    var pageSize = @pageSize;
+    var pageTotal = @pageTotal;
+    var total = @total;
+    var keyword = encodeURIComponent('@keyword');
+
+ 
+    var form = layui.form;
+
+    form.render();
+
+    //执行一个laypage实例
+    laypage.render({
+          elem: 'pageId'
+        , count: total
+        , limit: pageSize
+        , curr: pageIndex
+        , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+        , jump: function (obj, f) {
+            if (f)
+                return;
+            location.hash ="@Url.Action("LogLevelList")?pageIndex="   + obj.curr + "&pageSize=" + obj.limit + "&keyword=" + keyword + "&branchID=" + BranchID + "&departmentID=" + DepartmentID;
+            }
+        });
+     /*用户-删除*/
+     function member_del(obj) {
+            layer.confirm('确认要删除吗？',
+                function (index) {
+                    //发异步删除数据
+                    var Id = $(obj).parents("tr").data('Id');
+                    dtajax({
+                        url: '@Url.Action("LogLevelDel")',
+                        type: 'POST',
+                        data: {
+                            jobPositionID: Id
+                        },
+                        success: function(res) {
+                            layer.msg('已删除!', { icon: 1, time: 1000 },function () {
+                                location.href = "@Url.Action("LogLevelList")?pageIndex="   + pageIndex + "&pageSize=" + pageSize + "&keyword=" + $('input[name="keyword"]').val() + "&branchID=" + BranchID + "&departmentID=" + DepartmentID;
+                            });
+                        }
+                     });
+                });
+    }
+
+        form.on('switch(status)',
+            function (data) {
+                dtajax({
+                    url: '@Url.Action("LogLevelStatus")',
+                    type: 'POST',
+                    data: {
+                        Id: $(this).parents("tr").data('Id'),
+                        status: (this.checked ? 'true' : 'false')
+                    },
+                    success: function(res) {
+                        layer.msg('已修改', { icon: 1, time: 1000 });
+                    }
+            });
+
+       });
+
+      
+        $('.js-result-search').unbind().click(function () {
+            location.href = "@Url.Action("LogLevelList")?pageIndex="  + 1 + "&pageSize=" + pageSize + "&keyword=" + $('input[name="keyword"]').val() + "&branchID=" + $('select[name="BranchID"]').val() + "&departmentID=" + $('select[name="DepartmentID"]').val();
+        });
+
+      /*新增*/
+        function AddClickEvent() {
+            var url = '@Url.Action("LogLevelEdit")';
+            $.post(url, null, function (result) {
+                if (result.status === false)  {
+                    layer.msg(result.msg, { icon: 5, time: 2000 });
+                } else {
+                    xadmin.open('新增', url );
+                }
+            })
+        };
+
+        /*编辑*/
+          function EditClickEvent(obj) {
+              var Id = $(obj).parents("tr").data('Id');
+              var url = '@Url.Action("LogLevelEdit")' + "?Id=" + Id;
+              $.post(url,
+                  null,
+                  function(result) {
+                      if (result.status === false) {
+                          layer.msg(result.msg, { icon: 5, time: 2000 });
+                      } else {
+                          xadmin.open('编辑', url);
+                      }
+                  });
+          };
+    </script>
+}

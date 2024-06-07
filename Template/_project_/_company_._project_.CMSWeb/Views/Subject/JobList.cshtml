@@ -1,0 +1,29 @@
+﻿@{
+    var contentList = ViewBag.ContentList as List<CmsContent>;
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+
+    @Html.Partial("_Position")
+
+    <!-- 列表内容 -->
+    <div class="row">
+        @foreach (var job in contentList)
+        {
+            <div class="mb-3 col-12 col-sm-6 col-lg-3">
+                <div class="card bg-light">
+                    <div class="card-header">招聘职位：@job.Title</div>
+                    <div class="card-body">
+                        <p class="card-text">@job.Content.RemoveHtmlTags().RemoveBlank().ShowLength(50)</p>
+                        <a class="btn btn-info mt-2" href="@job.Link">查看详情</a>
+                    </div>
+                    <div class="card-footer">发布日期：@job.Date.ToCurrentTime()</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @Html.Partial("_Page")
+</div>

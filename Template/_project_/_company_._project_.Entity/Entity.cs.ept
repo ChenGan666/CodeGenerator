@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+
+namespace {Namespace}.Entity
+{
+	/// <summary>
+    /// {TableName}
+    /// </summary>
+    public partial class {ClassName}
+    {
+		public {ClassName}() { }
+
+        #region AutoField
+
+		<%loop fl FieldList%>
+		/// <summary>
+        /// {fl[FieldName]}
+        /// </summary>
+		public {fl[CSharpType]} {fl[FieldCSName]} { get; set; } {fl[DefaultValue]}
+
+		<%/loop%>
+
+        #endregion
+    }
+}

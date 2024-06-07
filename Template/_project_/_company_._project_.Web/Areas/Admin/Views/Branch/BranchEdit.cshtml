@@ -1,0 +1,109 @@
+﻿@{
+    var branch = ViewBag.Bac as BranchInfo;
+}
+
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@branch.BranchID" name="BranchID" />
+                <input type="hidden" value="@branch.SystemID" name="SystemID" />
+                <input type="hidden" value="@branch.bItemID" name="bItemID" />
+                <input type="hidden" value="@branch.bAppendTime" name="bAppendTime" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>分支名称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bName" lay-verify="required" value="@branch.bName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>分支代码
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bCode" lay-verify="required" value="@branch.bCode"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        联系人
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bLinkMan" value="@branch.bLinkMan"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        联系电话
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bTel" value="@branch.bTel"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        传真
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bFax" value="@branch.bFax"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        邮箱
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bEmail" value="@branch.bEmail"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bNote" value="@branch.bNote"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="bState" value="True" title="开启" @(branch.bState  ? "checked" : "")>
+                        <input type="radio" name="bState" value="False" title="停用" @(branch.bState  ? "" : "checked")>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var form = layui.form,
+            layer = layui.layer;
+        form.render();
+
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("BranchSave")');
+
+    </script>
+}

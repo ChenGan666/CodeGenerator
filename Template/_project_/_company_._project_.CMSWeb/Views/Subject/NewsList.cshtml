@@ -1,0 +1,41 @@
+﻿@{
+    var contentList = ViewBag.ContentList as List<CmsContent>;
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+
+    @Html.Partial("_Position")
+
+    @Html.Partial("_SortNav")
+
+    <!-- 列表内容 -->
+    <ul>
+        @foreach (var news in contentList)
+        {
+        <li class="lh-3 border-bottom-dashed">
+            <i class="fa fa-gg"></i>
+            <a href="@news.Link">
+                <span class="d-none d-md-inline">@news.Title.ShowLength(30)</span><!-- PC端 -->
+                <span class="d-inline d-md-none">@news.Title.ShowLength(11)</span><!-- 移动端 -->
+                @if (news.Istop == "1")
+                    {
+                <span class="badge badge-danger">置顶</span>
+                    }
+                @if (news.Isrecommend == "1")
+                    {
+                <span class="badge badge-warning">推荐</span>
+                    }
+                @if (news.Isheadline == "1")
+                    {
+                <span class="badge badge-info">头条</span>
+                    }
+                <span class="float-right">@news.Date.ToCurrentTime()</span>
+            </a>
+        </li>
+        }
+    </ul>
+
+    @Html.Partial("_Page")
+</div>

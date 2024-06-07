@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using {Namespace}.Entity;
+
+namespace {Namespace}.DAL
+{
+    public partial class DatabaseProvider
+    {
+        
+        private static I{ClassName}Manage {ClassName}Instance;
+        
+        private static readonly object {ClassName}LockObj = new object();
+
+        public static I{ClassName}Manage Get{ClassName}(string connectionName)
+        {
+            if ({ClassName}Instance == null)
+            {
+                lock ({ClassName}LockObj)
+                {
+                    if ({ClassName}Instance == null)
+                    {
+                        Get{ClassName}Provider(connectionName);
+                    }
+                }
+            }
+            return {ClassName}Instance;
+        }
+
+        private static void Get{ClassName}Provider(string connectionName)
+        {
+            try
+            {
+                var db = DbConfig.GetDbInfo(connectionName);
+                var type = Type.GetType(
+                    $"{Namespace}.DAL." + db.DbType + ".{ClassName}Manage, {Namespace}.DAL." + db.DbType,
+                    false, true);
+                var provider = (I{ClassName}Manage)Activator.CreateInstance(type);
+	provider.SetConnectionName(connectionName);
+                {ClassName}Instance = provider;
+            }
+            catch (Exception e)
+            {
+                throw new DbException();
+            }
+        }
+    }
+}
+

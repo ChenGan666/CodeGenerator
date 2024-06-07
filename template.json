@@ -32,7 +32,7 @@
         "_company_._project_.Entity",
         "_company_._project_.Service",
         "_company_._project_.Web",
-        "FJData.Utils.Core",
+        "ZSN.Utils.Core",
         ".gitattributes",
         ".gitignore",
         "_project_.sln"

@@ -1,0 +1,198 @@
+﻿@{
+    int pageIndex = ViewBag.PageIndex;
+    int pageSize = ViewBag.PageSize;
+    int pageTotal = ViewBag.PageTotal;
+    int total = ViewBag.Total;
+    int branchId = ViewBag.BranchID;
+    string keyword = ViewBag.Keyword;
+    string pageTitle = ViewBag.PageTitle;
+    var dlist = ViewBag.DepartmentList as List<DepartmentInfo>;
+    var blist = ViewBag.BranchList as List<BranchInfo>;
+}
+@functions {
+    public string IsDisabled()
+    {
+        if (!UserServiceHelper.CheckUserPermission("Department/DepartmentStatus"))
+        {
+            return "disabled='disabled'";
+        }
+        return "";
+    }
+}
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>@pageTitle</legend>
+</fieldset>
+
+<div class="layui-row layui-form">
+    <button class="layui-btn" onclick="AddClickEvent();" style="margin-right:50px;"><i class="layui-icon"></i>增加</button>
+
+    @if (blist != null)
+    {<label>所属分支</label>
+        <div class="layui-input-inline layui-show-xs-block">
+            <select name="BranchID" lay-verify="required">
+                <option value="0">请选择</option>
+                @foreach (var b in blist)
+                {
+                    <option value="@b.BranchID" @(b.BranchID == branchId ? "selected" : "")>@b.bName</option>
+                }
+            </select>
+        </div>
+    }
+
+
+    <div class="layui-input-inline layui-show-xs-block" style="width: 300px;">
+        <input type="text" name="keyword" value="@keyword" class="layui-input" placeholder="搜索部门">
+    </div>
+
+
+    <button class="layui-btn js-result-search">搜索</button>
+</div>
+
+<div class="layui-form">
+    <table class="layui-table">
+        <colgroup>
+            <col width="142">
+            <col width="142">
+            <col width="300">
+            <col width="400">
+            <col width="73">
+            <col width="280">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>分支名称</th>
+                <th>部门名称</th>
+                <th>直属上级</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in dlist)
+            {
+                <tr data-bid="@b.DepartmentID">
+                    <td>@b.BranchName</td>
+                    <td>@b.dName</td>
+                    <td>@b.dDirector</td>
+                    <td>@b.dAppendTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <input type="checkbox" @IsDisabled() name="switch" lay-text="开启|停用" lay-skin="switch" lay-filter="status" @(b.dState ? "checked" : "")>
+                    </td>
+                    <td>
+                        <button class="layui-btn layui-btn layui-btn-xs" onclick="EditClickEvent(this);"><i class="layui-icon">&#xe642;</i>编辑</button>
+                        <button class="layui-btn-danger layui-btn layui-btn-xs" onclick="member_del(this)"><i class="layui-icon">&#xe640;</i>删除</button>
+                    </td>
+                </tr>
+            }
+            @if (dlist.Count == 0)
+            {
+                <tr>
+                    <td colspan="6">暂无部门</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div id="pageId" class="pagination"></div>
+</div>
+
+@section Js{
+    <script>
+
+    var laypage = layui.laypage;
+    var pageIndex = @pageIndex;
+    var pageSize = @pageSize;
+    var pageTotal = @pageTotal;
+    var total = @total;
+    var keyword = encodeURIComponent('@keyword');
+    var BranchID =@branchId;
+
+    var form = layui.form;
+
+    form.render();
+
+    //执行一个laypage实例
+    laypage.render({
+          elem: 'pageId'
+        , count: total
+        , limit: pageSize
+        , curr: pageIndex
+        , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+        , jump: function (obj, f) {
+            if (f)
+                return;
+            location.href = "/Department/DepartmentList?pageIndex=" + obj.curr + "&pageSize=" + obj.limit + "&keyword=" + keyword + "&branchID=" + BranchID;
+            }
+        });
+     /*用户-删除*/
+     function member_del(obj) {
+            layer.confirm('确认要删除吗？',
+                function (index) {
+                    //发异步删除数据
+                    var bid = $(obj).parents("tr").data('bid');
+                    dtajax({
+                        url: '@Url.Action("DepartmentDel")',
+                        type: 'POST',
+                        data: {
+                            departmentID: bid
+                        },
+                        success: function(res) {
+                            layer.msg('已删除!', { icon: 1, time: 1000 },function () {
+                                location.href = "/Department/DepartmentList?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&keyword=" + keyword +"&branchID=" + BranchID;;
+                            });
+                        }
+                     });
+                });
+        }
+
+        form.on('switch(status)',
+            function (data) {
+                dtajax({
+                    url: '@Url.Action("DepartmentStatus")',
+                    type: 'POST',
+                    data: {
+                        departmentID: $(this).parents("tr").data('bid'),
+                        status: (this.checked ? 'true' : 'false')
+                    },
+                    success: function(res) {
+                        layer.msg('已修改', { icon: 1, time: 1000 });
+                    }
+            });
+
+        });
+
+        $('.js-result-search').unbind().click(function () {
+            location.href = "/Department/DepartmentList?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&keyword=" + $('input[name="keyword"]').val() + "&branchID=" + $('select[name="BranchID"]').val();;
+        });
+
+     /*新增*/
+        function AddClickEvent() {
+            var url = '@Url.Action("DepartmentEdit")';
+            $.post(url,
+                null,
+                function(result) {
+                    if (result.status === false) {
+                        layer.msg(result.msg, { icon: 5, time: 2000 });
+                    } else {
+                        xadmin.open('新增', '@Url.Action("DepartmentEdit")')
+                    }
+                });
+
+        };
+
+     /*编辑*/
+          function EditClickEvent(obj) {
+              var departmentId = $(obj).parents("tr").data('bid');
+              var url = '@Url.Action("DepartmentEdit")' + "?DepartmentID=" + departmentId;
+              $.post(url,
+                  null,
+                  function(result) {
+                      if (result.status === false) {
+                          layer.msg(result.msg, { icon: 5, time: 2000 });
+                      } else {
+                          xadmin.open('编辑', url);
+                      }
+                  });
+          };
+    </script>
+}

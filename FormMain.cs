@@ -14,6 +14,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZNS.CodeGenerator.Utils;
 using ZSN.CodeGenerator;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using System.Data.SqlClient;
+using System.Xml;
 
 namespace CodeGenerator
 {
@@ -27,11 +34,9 @@ namespace CodeGenerator
         private string _buildPath = "";
 
         private readonly string _basePath = Directory.GetCurrentDirectory();
-        private readonly string _templatePath = Path.Combine(Directory.GetCurrentDirectory(),
-                                                    "Template",
-                                                    "_project_");
+        private string _templatePath = "";
 
-        private readonly string _tempPath = Path.Combine(Directory.GetCurrentDirectory(), "Temp");
+        private string _tempPath = "";
 
         private readonly Dictionary<string, DataTable> _tableInfos = new Dictionary<string, DataTable>();
 
@@ -46,6 +51,10 @@ namespace CodeGenerator
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
+            this._templatePath = Path.Combine(this._basePath,
+                                                    "Template",
+                                                    "_project_");
+            this._tempPath = Path.Combine(this._basePath, "Temp");
             CheckTemplate();
             CheckServerLogin();
             textBox_ConnectionName.Text = ConfigHelper.GetString("DefaultConnectionName");
@@ -90,9 +99,8 @@ namespace CodeGenerator
             if (!Directory.Exists(_templatePath))
             {
                 Directory.CreateDirectory(_templatePath);
-                var sourceDic = new DirectoryInfo(@"../../Template/_project_");
-                CopyFolder(sourceDic.FullName,
-                    Directory.GetCurrentDirectory() + "/Template/");
+                var sourceDic = new DirectoryInfo(this._basePath + @"/Template/_project_");
+                CopyFolder(sourceDic.FullName, this._basePath + "/Template/");
             }
             DeleteDirectory(_tempPath);
         }
@@ -477,7 +485,7 @@ namespace CodeGenerator
         {
             var temStr = BuildTemplateFile(sourceFile);
             var file = Path.Combine(Path.GetDirectoryName(destFile), Path.GetFileNameWithoutExtension(destFile));
-            CompileFile(temStr, file, GetSelectTable()[0]);
+            CompileFileAsync(temStr, file, GetSelectTable()[0]);
             return;
         }
 
@@ -489,7 +497,7 @@ namespace CodeGenerator
             {
                 var tc = GetTableClassName(t);
                 var file = Path.Combine(Path.GetDirectoryName(destFile), $"{tc}Business.cs");
-                CompileFile(temStr, file, t);
+                CompileFileAsync(temStr, file, t);
             }
             return;
         }
@@ -502,7 +510,7 @@ namespace CodeGenerator
             {
                 var tc = GetTableClassName(t);
                 var file = Path.Combine(Path.GetDirectoryName(destFile), $"{tc}Manage.cs");
-                CompileFile(temStr, file, t);
+                CompileFileAsync(temStr, file, t);
             }
             return;
         }
@@ -515,7 +523,7 @@ namespace CodeGenerator
             {
                 var tc = GetTableClassName(t);
                 var file = Path.Combine(Path.GetDirectoryName(destFile), $"I{tc}Manage.cs");
-                CompileFile(temStr, file, t);
+                CompileFileAsync(temStr, file, t);
             }
             return;
         }
@@ -528,7 +536,7 @@ namespace CodeGenerator
             {
                 var tc = GetTableClassName(t);
                 var file = Path.Combine(Path.GetDirectoryName(destFile), $"{tc}Provider.cs");
-                CompileFile(temStr, file, t);
+                CompileFileAsync(temStr, file, t);
             }
             return;
         }
@@ -541,7 +549,7 @@ namespace CodeGenerator
             {
                 var tc = GetTableClassName(t);
                 var file = Path.Combine(Path.GetDirectoryName(destFile), $"{tc}.cs");
-                CompileFile(temStr, file, t);
+                CompileFileAsync(temStr, file, t);
             }
             return;
         }
@@ -582,7 +590,7 @@ namespace CodeGenerator
             obj["DbConnectionStrings"]["BaseDb"]["Connection"] = $"server={DBServer.Current.ServerIp};userid={DBServer.Current.ServerUser};password={DBServer.Current.ServerPwd};database={DBServer.Current.ServerDbName}";
             obj["DbConnectionStrings"]["LogBaseDb"]["DbType"] = "MySql";
             obj["DbConnectionStrings"]["LogBaseDb"]["Connection"] = $"server={DBServer.Current.ServerIp};userid={DBServer.Current.ServerUser};password={DBServer.Current.ServerPwd};database=logbasedb";
-            File.WriteAllText(destFile, JsonConvert.SerializeObject(obj, Formatting.Indented));
+            File.WriteAllText(destFile, JsonConvert.SerializeObject(obj, Newtonsoft.Json.Formatting.Indented));
             return;
         }
 
@@ -685,7 +693,92 @@ namespace CodeGenerator
             File.WriteAllText(destFile, fileStr, Encoding.Default);
             return;
         }
+        private async Task CompileFileAsync(string templateFileStr, string destFile, string tableName)
+        {
+            var fileStr = "";
 
+            if (templateFileStr.Trim() != "")
+            {
+                // 创建一个C#语法树
+                SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(templateFileStr);
+
+                // 引用必要的元数据
+                MetadataReference[] references = new MetadataReference[]
+                {
+
+                MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(SqlConnection).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(DataRowExtensions).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(XmlDocument).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Form).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(File).GetTypeInfo().Assembly.Location), // System.IO
+
+                };
+
+                // 创建编译选项
+                CSharpCompilationOptions options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+
+                // 创建一个编译对象
+                CSharpCompilation compilation = CSharpCompilation.Create(
+                    "DynamicAssembly",
+                    syntaxTrees: new[] { syntaxTree },
+                    references: references,
+                    options: options
+                    );
+
+                // 编译代码
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    EmitResult result = compilation.Emit(ms);
+
+                    if (!result.Success)
+                    {
+                        // 编译失败，处理错误
+                        IEnumerable<Diagnostic> failures = result.Diagnostics.Where(diagnostic =>
+                            diagnostic.IsWarningAsError ||
+                            diagnostic.Severity == DiagnosticSeverity.Error);
+
+                        foreach (Diagnostic diagnostic in failures)
+                        {
+                            Console.Error.WriteLine($"编译错误: {diagnostic}");
+                        }
+                    }
+                    else
+                    {
+                        // 编译成功，加载编译后的程序集
+                        ms.Seek(0, SeekOrigin.Begin);
+                        Assembly assembly = Assembly.Load(ms.ToArray());
+
+                        List<string> fieldStr = this.GetFieldStrArray(tableName);
+                        var selectedTable = _tableInfos[tableName];
+                        var pkRow = selectedTable.Rows.Cast<DataRow>().FirstOrDefault(t => t["IsPKey"].ToString() == "y") ?? selectedTable.Rows[0];
+
+                        object obj = assembly.CreateInstance("DoCode.Do");
+                        MethodInfo objMi = obj.GetType().GetMethod("initTemplateStr");
+                        object reStr = objMi.Invoke(obj,
+                            new object[]
+                            {
+                                selectedTable,
+                                Namespace,
+                                tableName,
+                                GetTableClassName(tableName),
+                                fieldStr,
+                                textBox_ConnectionName.Text,
+                                pkRow["FieldCSName"].ToString().ToFirstLower(),
+                                pkRow
+                            });
+                        if (reStr != null)
+                        {
+                            fileStr = (string)reStr;
+                        }
+                    }
+                }
+            }
+            File.WriteAllText(destFile, fileStr, Encoding.Default);
+            return;
+        }
         #endregion
 
         /// <summary>

@@ -1,0 +1,93 @@
+﻿@{
+    var department = ViewBag.Dic as DepartmentInfo;
+    var bList = ViewBag.BranchList as List<BranchInfo>;
+}
+
+ 
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@department.SystemID" name="SystemID" />
+                <input type="hidden" value="@department.BranchName" name="BranchName" />
+                <input type="hidden" value="@department.DepartmentID" name="DepartmentID" />
+                <input type="hidden" value="@department.dItemID" name="dItemID" />
+                <input type="hidden" value="@department.dAppendTime" name="bAppendTime" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>部门名称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="dName" lay-verify="required" value="@department.dName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>所属分支
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (bList != null)
+                        {
+                            <select name="BranchID" lay-verify="required">
+                                <option value="0">请选择</option>
+                                @foreach (var b in bList)
+                                {
+                                  <option @(b.BranchID == department.BranchID ? "selected" : "" ) value="@b.BranchID" >@b.bName</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        直属领导
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="dDirector" value="@department.dDirector"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="dNote" value="@department.dNote"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="dState" value="True" title="开启" @(department.dState ? "checked" : "")>
+                        <input type="radio" name="dState" value="False" title="停用" @(department.dState ? "" : "checked")>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var form = layui.form,
+            layer = layui.layer;
+        form.render();
+
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("DepartmentSave")');
+
+    </script>
+}

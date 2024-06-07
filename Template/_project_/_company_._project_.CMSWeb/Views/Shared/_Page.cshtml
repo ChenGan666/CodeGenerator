@@ -1,0 +1,56 @@
+﻿@{
+    int pageNum = ViewBag.PageNum;
+    int pageSize = ViewBag.PageSize;
+    int pageTotal = ViewBag.PageTotal;
+    int total = ViewBag.Total;
+    int pageShowNum = ViewBag.PageShowNum;
+    var url = GlobalLabel.PageUrl + "?pageNum=";
+    var index = url + 1;
+    var pre = pageNum == 1 ? "javascript:;" : url +(pageNum - 1);
+    var next = pageNum == pageTotal ?"javascript:;" : url +(pageNum + 1);
+    var last = url + pageTotal;
+
+    // 显示中间
+    var showNum = "";
+    var showBegin = 1;
+    var showEnd = pageTotal;
+    var showHalf = (int)Math.Ceiling((pageShowNum - 1) / 2M);
+    if (pageNum - 1 <= showHalf)
+    {
+        showBegin = 1;
+        showEnd = Math.Min(pageTotal, pageShowNum);
+    }
+    else if (pageTotal - pageNum <= showHalf)
+    {
+        showEnd = pageTotal;
+        showBegin = Math.Max(1, pageTotal - pageShowNum + 1);
+    }
+    else
+    {
+        showBegin = pageNum - showHalf;
+        showEnd = pageShowNum + showBegin - 1;
+    }
+    for (int i = showBegin; i <= showEnd; i++)
+    {
+        var link = i == pageNum ? "page-num page-num-current" : "page-num";
+        showNum += $"<a class=\"{link}\" href=\"{url + i}\">{i}</a>";
+    }
+}
+
+<!-- 分页 -->
+@if (total > 0)
+{
+<nav aria-label="page navigation" class="my-4">
+    <div class="pagination justify-content-center">
+        <a class="page-item page-link" href="@index">首页</a>
+        <a class="page-item page-link" href="@pre">上一页</a>
+        @Html.Raw(showNum)<!-- 数字条，小屏幕时自动隐藏-->
+        <a class="page-item page-link" href="@next">下一页</a>
+        <a class="page-item page-link" href="@last">尾页</a>
+    </div>
+</nav>
+}
+else
+{
+<div class="text-center my-5 text-secondary">本分类下无任何数据！</div>
+}

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FJData.Utils.Core\FJData.Utils.Core.csproj" />
+    <ProjectReference Include="..\_company_._project_.BLL\_company_._project_.BLL.csproj" />
+    <ProjectReference Include="..\_company_._project_.DAL\_company_._project_.DAL.csproj" />
+    <ProjectReference Include="..\_company_._project_.Entity\_company_._project_.Entity.csproj" />
+  </ItemGroup>
+
+</Project>

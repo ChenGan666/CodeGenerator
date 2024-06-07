@@ -6,16 +6,13 @@
       "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\utils\\filetemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\formlogin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\formlogin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\formlogin.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|\\\\mac\\dev\\app\\zsn\\codegenerator\\template.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -25,8 +22,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "template.json",
+              "DocumentMoniker": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\template.json",
+              "RelativeDocumentMoniker": "template.json",
+              "ToolTip": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\template.json",
+              "RelativeToolTip": "template.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-06-06T13:20:14.619Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FileTemplate.cs",
+              "DocumentMoniker": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\Utils\\FileTemplate.cs",
+              "RelativeDocumentMoniker": "Utils\\FileTemplate.cs",
+              "ToolTip": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\Utils\\FileTemplate.cs",
+              "RelativeToolTip": "Utils\\FileTemplate.cs",
+              "ViewState": "AQIAAA0BAAAAZGZmZmYhwCQBAAAYAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-06T12:11:33.654Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -35,52 +58,14 @@
               "RelativeDocumentMoniker": "FormMain.cs",
               "ToolTip": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormMain.cs",
               "RelativeToolTip": "FormMain.cs",
-              "ViewState": "AQIAAKwCAAAyMzMzMzMiwMQCAAA1AAAA",
+              "ViewState": "AQIAANcCAAAAAAAAAAAqwOgCAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-05T14:48:59.176Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "FormLogin.cs [\u8BBE\u8BA1]",
-              "DocumentMoniker": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormLogin.cs",
-              "RelativeDocumentMoniker": "FormLogin.cs",
-              "ToolTip": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormLogin.cs [\u8BBE\u8BA1]",
-              "RelativeToolTip": "FormLogin.cs [\u8BBE\u8BA1]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-05T14:23:43.649Z",
-              "EditorCaption": " [\u8BBE\u8BA1]"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "FormLogin.cs",
-              "DocumentMoniker": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormLogin.cs",
-              "RelativeDocumentMoniker": "FormLogin.cs",
-              "ToolTip": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormLogin.cs",
-              "RelativeToolTip": "FormLogin.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAAAdAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-05T13:42:10.32Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "FormLogin.Designer.cs",
-              "DocumentMoniker": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormLogin.Designer.cs",
-              "RelativeDocumentMoniker": "FormLogin.Designer.cs",
-              "ToolTip": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormLogin.Designer.cs",
-              "RelativeToolTip": "FormLogin.Designer.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAANYAAAA0AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-05T13:39:50.368Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "FormMain.cs [\u8BBE\u8BA1]",
               "DocumentMoniker": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\FormMain.cs",
               "RelativeDocumentMoniker": "FormMain.cs",

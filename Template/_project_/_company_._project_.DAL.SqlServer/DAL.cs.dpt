@@ -1,0 +1,426 @@
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
+
+using {Namespace}.Entity;
+using {Namespace}.DAL;
+
+namespace {Namespace}.DAL.SqlServer
+{
+    public partial class {ClassName}Manage : I{ClassName}Manage
+    {
+        ///表链接
+        private string {ClassName}ConnectionName = "{ConnectionName}";
+
+        ///表名称
+        private const string {ClassName}TableName = "{TableName}";
+
+		<%csharp%>
+			int loop_i = 0;
+			string FieldStr = string.Join(",", FieldStrList.ToArray());
+			
+            List<string> addList = new List<string>();
+            if (PKRow["IsIdentity"].ToString().ToLower() == "y")
+            {
+                //addList = FieldStrList.Skip(1).ToList();
+            }else{
+                addList = FieldStrList;
+            }
+            string FieldStrForAdd = string.Join(",",addList.ToArray());
+            string FieldStrAtForAdd = "@"+string.Join(",@", addList.ToArray());
+
+			StringBuilder parameters_add = new StringBuilder();
+			StringBuilder parameters_add_value = new StringBuilder();
+			
+			
+			StringBuilder parameters_update = new StringBuilder();
+			StringBuilder parameters_update_sql = new StringBuilder();
+			StringBuilder parameters_update_value = new StringBuilder();
+			
+            int j = 0;
+            int h = 0;
+
+			for(int i=0;i<FieldList.Rows.Count;i++)
+			{
+				//Add
+                if(PKName.ToString().ToLower() == FieldList.Rows[i]["FieldCSName"].ToString().ToLower() && PKRow["IsIdentity"].ToString().ToLower() == "y"){
+
+                }
+				else{ 
+                    if(i==(FieldList.Rows.Count-1)){
+					    parameters_add.AppendLine(" new SqlParameter("+QM+"@"+FieldList.Rows[i]["FieldName"].ToString()+""+QM+", SqlDbType."+FieldList.Rows[i]["FieldType"].ToString()+","+FieldList.Rows[i]["FieldLength"].ToString()+")");
+				    }else{
+					    parameters_add.AppendLine(" new SqlParameter("+QM+"@"+FieldList.Rows[i]["FieldName"].ToString()+""+QM+", SqlDbType."+FieldList.Rows[i]["FieldType"].ToString()+","+FieldList.Rows[i]["FieldLength"].ToString()+"),");
+				    }
+				    parameters_add_value.AppendLine(" parameters["+j+"].Value = model."+FieldList.Rows[i]["FieldCSName"].ToString()+";");
+                    j++;
+                }
+				
+				//Update
+				if(PKName.ToString().ToLower() != FieldList.Rows[i]["FieldName"].ToString().ToLower()){
+					if(i == (FieldList.Rows.Count-1)){
+						parameters_update_sql.AppendLine("strSql.Append("+QM+""+FieldList.Rows[i]["FieldName"].ToString()+"=@"+FieldList.Rows[i]["FieldName"].ToString()+ QM+");");
+					}else{
+						parameters_update_sql.AppendLine("strSql.Append("+QM+""+FieldList.Rows[i]["FieldName"].ToString()+"=@"+FieldList.Rows[i]["FieldName"].ToString()+","+QM+");");
+					}
+				}
+				if(i==(FieldList.Rows.Count-1)){
+					parameters_update.AppendLine(" new SqlParameter("+QM+"@"+FieldList.Rows[i]["FieldName"].ToString()+""+QM+", SqlDbType."+FieldList.Rows[i]["FieldType"].ToString()+","+FieldList.Rows[i]["FieldLength"].ToString()+")");
+				}else{
+					parameters_update.AppendLine(" new SqlParameter("+QM+"@"+FieldList.Rows[i]["FieldName"].ToString()+""+QM+", SqlDbType."+FieldList.Rows[i]["FieldType"].ToString()+","+FieldList.Rows[i]["FieldLength"].ToString()+"),");
+				}
+				parameters_update_value.AppendLine(" parameters["+h+"].Value = model."+FieldList.Rows[i]["FieldCSName"].ToString()+";");
+				h++;
+			}
+		<%/csharp%>
+
+        ///表字段
+        private const string {ClassName}TableField = "{FieldStr}";
+
+        ///添加用表字段
+        private const string {ClassName}TableFieldForAdd = "{FieldStrForAdd}";
+
+        ///添加用表字段value
+        private const string {ClassName}TableFieldAltForAdd = "{FieldStrAtForAdd}";
+
+        public string SetConnectionName(string connName)
+        {
+            return {ClassName}ConnectionName = connName;
+        }
+		/// <summary>
+        /// 增加一条数据
+        /// </summary>
+        public int {ClassName}_Add({ClassName} model)
+        {
+            StringBuilder strSql = new StringBuilder();
+
+            strSql.Append("insert into ");
+            strSql.Append({ClassName}TableName);
+			strSql.Append(" (");
+            strSql.Append({ClassName}TableFieldForAdd);
+            strSql.Append(") values (");
+            strSql.Append({ClassName}TableFieldAltForAdd);
+            strSql.Append(")");
+            strSql.Append(";select @@IDENTITY");
+			
+            SqlParameter[] parameters = {
+				
+			{parameters_add}
+					
+					};
+					
+			{parameters_add_value}
+            
+
+            object obj = DbHelper.ExecuteScalar(DbConfig.GetDbInfo({ClassName}ConnectionName), CommandType.Text,strSql.ToString(), parameters);
+            if (obj == null)
+            {
+                return 0;
+            }
+            else
+            {
+                return Convert.ToInt32(obj);
+            }
+        }
+
+        /// <summary>
+        /// 更新一条数据
+        /// </summary>
+        public bool {ClassName}_Update({ClassName} model)
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("update ");
+            strSql.Append({ClassName}TableName);
+            strSql.Append(" set ");
+			
+			{parameters_update_sql}
+			
+            strSql.Append(" where {PKRow[FieldName]}=@{PKRow[FieldName]}");
+			
+            SqlParameter[] parameters = {
+				{parameters_update}
+			};
+			
+			{parameters_update_value}
+
+            int rows = DbHelper.ExecuteNonQuery(DbConfig.GetDbInfo({ClassName}ConnectionName),CommandType.Text,strSql.ToString(), parameters);
+            if (rows > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 删除一条数据
+        /// </summary>
+        public bool {ClassName}_Delete({PKRow[CSharpType]} {PKName})
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("delete from ");
+            strSql.Append({ClassName}TableName);
+            strSql.Append(" where {PKRow[FieldName]}=@{PKRow[FieldName]}");
+            SqlParameter[] parameters = {
+					new SqlParameter("@{PKRow[FieldName]}", SqlDbType.{PKRow[FieldType]}, {PKRow[FieldLength]})
+			};
+            parameters[0].Value = {PKName};
+
+            int rows = DbHelper.ExecuteNonQuery(DbConfig.GetDbInfo({ClassName}ConnectionName), CommandType.Text,strSql.ToString(), parameters);
+            if (rows > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// 批量删除数据
+        /// </summary>
+        public bool {ClassName}_DeleteList(string {PKName}list)
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("delete from ");
+            strSql.Append({ClassName}TableName);
+            strSql.Append(" where {PKRow[FieldName]} in (" + {PKName}list + ")  ");
+            int rows = DbHelper.ExecuteNonQuery(DbConfig.GetDbInfo({ClassName}ConnectionName), CommandType.Text,strSql.ToString());
+            if (rows > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// 得到一个对象实体
+        /// </summary>
+        public {ClassName} {ClassName}_GetModel({PKRow[CSharpType]} {PKName})
+        {
+
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("select top 1 ");
+            strSql.Append({ClassName}TableField);
+            strSql.Append(" from ");
+            strSql.Append({ClassName}TableName);
+            strSql.Append(" where {PKRow[FieldName]}=@{PKRow[FieldName]}");
+            SqlParameter[] parameters = {
+					new SqlParameter("@{PKRow[FieldName]}", SqlDbType.{PKRow[FieldType]}, {PKRow[FieldLength]})
+			};
+            parameters[0].Value = {PKName};
+
+            {ClassName} model = new {ClassName}();
+            DataSet ds = DbHelper.ExecuteDataset(DbConfig.GetDbInfo({ClassName}ConnectionName), CommandType.Text,strSql.ToString(), parameters);
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                return {ClassName}_DataRowToModel(ds.Tables[0].Rows[0]);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// 得到一个对象实体
+        /// </summary>
+        public {ClassName} {ClassName}_DataRowToModel(DataRow row)
+        {
+            {ClassName} model = new {ClassName}();
+            if (row != null)
+            {
+				<%loop fl4 FieldList%>
+				
+				if (row["{fl4[FieldName]}"] != null )
+                {
+					<%if fl4["CSharpType"].ToString().Contains("Int32") %>
+                        model.{fl4[FieldCSName]} = int.Parse(row["{fl4[FieldName]}"].ToString());
+					<%else%>
+						<%if fl4["CSharpType"].ToString().Contains("DateTime") %>
+					model.{fl4[FieldCSName]} = DateTime.Parse(row["{fl4[FieldName]}"].ToString());
+						<%else%>
+							<%if fl4["CSharpType"].ToString().Contains("decimal")%>
+					model.{fl4[FieldCSName]} = decimal.Parse(row["{fl4[FieldName]}"].ToString());
+							<%else%>
+								<%if fl4["CSharpType"].ToString().Contains("bool")%>
+					model.{fl4[FieldCSName]} = bool.Parse(row["{fl4[FieldName]}"].ToString());
+								<%else%>
+                                    <%if fl4["CSharpType"].ToString().Contains("Int64")%>
+					model.{fl4[FieldCSName]} = long.Parse(row["{fl4[FieldName]}"].ToString());
+								    <%else%>
+                                        <%if fl4["CSharpType"].ToString().Contains("byte[]")%>
+					model.{fl4[FieldCSName]} = row["{fl4[FieldName]}"].ToString() != "" ?  (byte[])row["{fl4[FieldName]}"] : null;
+								        <%else%>
+					model.{fl4[FieldCSName]} = row["{fl4[FieldName]}"].ToString();
+								        <%/if%>
+								    <%/if%>
+								<%/if%>
+							<%/if%>
+						<%/if%>
+					<%/if%>
+                }
+				
+				<%/loop%>
+				
+            }
+            return model;
+        }
+
+        /// <summary>
+        /// 获得数据列表
+        /// </summary>
+        public DataSet {ClassName}_GetList(string strWhere = "")
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("select ");
+            strSql.Append({ClassName}TableField);
+            strSql.Append(" FROM ");
+            strSql.Append({ClassName}TableName);
+            if (strWhere.Trim() != "")
+            {
+                strSql.Append(" where " + strWhere);
+            }
+            return DbHelper.ExecuteDataset(DbConfig.GetDbInfo({ClassName}ConnectionName), CommandType.Text,strSql.ToString());
+        }
+
+        /// <summary>
+        /// 获得前几行数据
+        /// </summary>
+        public DataSet {ClassName}_GetList(int top, string strWhere, string filedOrder)
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("select ");
+            if (top > 0)
+            {
+                strSql.Append(" top " + top.ToString() + " ");
+            }
+            strSql.Append({ClassName}TableField);
+            strSql.Append(" FROM ");
+            strSql.Append({ClassName}TableName);
+
+            if (strWhere.Trim() != "")
+            {
+                strSql.Append(" where " + strWhere);
+            }
+            if (filedOrder.Trim() != "")
+            {
+                strSql.Append(" order by " + filedOrder);
+            }
+            return DbHelper.ExecuteDataset(DbConfig.GetDbInfo({ClassName}ConnectionName),CommandType.Text,strSql.ToString());
+        }
+
+        /// <summary>
+        /// 获取记录总数
+        /// </summary>
+        public int {ClassName}_GetRecordCount(string strWhere = "")
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("select count(1) FROM ");
+            strSql.Append({ClassName}TableName);
+            if (strWhere.Trim() != "")
+            {
+                strSql.Append(" where " + strWhere);
+            }
+            object obj = DbHelper.ExecuteScalar(DbConfig.GetDbInfo({ClassName}ConnectionName),CommandType.Text,strSql.ToString());
+            if (obj == null)
+            {
+                return 0;
+            }
+            else
+            {
+                return Convert.ToInt32(obj);
+            }
+        }
+
+        /// <summary>
+        /// 分页获取数据列表
+        /// </summary>
+        public DataSet {ClassName}_GetListByPage(string strWhere, string orderBy, int startIndex, int endIndex)
+        {
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("SELECT * FROM ( ");
+            strSql.Append(" SELECT ROW_NUMBER() OVER (");
+            if (!string.IsNullOrEmpty(orderBy.Trim()))
+            {
+                strSql.Append("order by T." + orderBy);
+            }
+            else
+            {
+                strSql.Append("order by T.DicID desc");
+            }
+            strSql.Append(")AS Row, T.*  from ");
+            strSql.Append({ClassName}TableName);
+            strSql.Append(" T ");
+            if (!string.IsNullOrEmpty(strWhere.Trim()))
+            {
+                strSql.Append(" WHERE " + strWhere);
+            }
+            strSql.Append(" ) TT");
+            strSql.AppendFormat(" WHERE TT.Row between " + startIndex + " and " + endIndex);
+            return DbHelper.ExecuteDataset(DbConfig.GetDbInfo({ClassName}ConnectionName),CommandType.Text,strSql.ToString());
+        }
+
+        /// <summary>
+        /// 分页获取数据列表
+        /// </summary>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="pageIndex">页标</param>
+        /// <param name="strWhere">查询条件</param>
+        /// <param name="pagetotal">总页数</param>
+        /// <param name="total">总数</param>
+        /// <param name="orderType">排序规则， 默认降序，1降序，0升序</param>
+        /// <param name="showName">显示字段，默认全部</param>
+        /// <param name="orderKey">排序key，默认主键</param>
+        public DataTable {ClassName}_GetListByPage(int pageSize, int pageIndex, string strWhere, out int pagetotal, out int total, int orderType = 1, string showName = "*", string orderKey = "{PKRow[FieldName]}")
+        {
+            SqlParameter[] parameters = {
+                    new SqlParameter("@tblName", SqlDbType.VarChar, 255),
+                    new SqlParameter("@fldName", SqlDbType.VarChar, 255),
+                    new SqlParameter("@PageSize", SqlDbType.Int),
+                    new SqlParameter("@PageIndex", SqlDbType.Int),
+                    new SqlParameter("@IsReCount", SqlDbType.Bit),
+                    new SqlParameter("@OrderType", SqlDbType.Bit),
+                    new SqlParameter("@strWhere", SqlDbType.VarChar,1000),
+                    new SqlParameter("@showFName", SqlDbType.VarChar,1000),
+                    };
+            parameters[0].Value = "{TableName}";
+            parameters[1].Value = orderKey;
+            parameters[2].Value = pageSize;
+            parameters[3].Value = pageIndex;
+            parameters[4].Value = 1;
+            parameters[5].Value = orderType;
+            parameters[6].Value = strWhere;
+            parameters[7].Value = showName;
+            DataSet ds = DbHelper.ExecuteDataset(DbConfig.GetDbInfo({ClassName}ConnectionName),CommandType.StoredProcedure, "UP_GetRecordByPage", parameters);
+            total = 0;
+            if (ds.Tables.Count > 1)
+            {
+                total = (int)ds.Tables[0].Rows[0][0];
+
+                if (total % pageSize == 0)
+                {
+                    pagetotal = total / pageSize;
+                }
+                else
+                {
+                    pagetotal = total / pageSize + 1;
+                }
+                return ds.Tables[1];
+            }
+            else
+            {
+                pagetotal = 0;
+                return null;
+            }
+        }
+	}
+}

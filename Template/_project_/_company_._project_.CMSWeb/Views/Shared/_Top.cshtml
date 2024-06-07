@@ -1,0 +1,13 @@
+﻿@{
+    var sort = ContentSortHelper.CurrentSort;
+    var navList = ContentSortHelper.SortList.Where(t => t.Pcode == sort.Tcode).Take(10).ToList();
+}
+
+<!-- 头部大屏 -->
+<div class="jumbotron jumbotron-fluid mb-2" 
+     style="background: #e9ecef url(@(sort.Pic.IsNullOrEmpty() ? $"{GlobalLabel.SitePath}/static/upload/image/20180412/1523501459462835.jpg" : sort.Pic));background-size:cover;no-repeat">
+    <div class="container text-light">
+        <h1 class="fs-18 fs-sm-26 wow fadeInDown">@sort.Name</h1>
+        <p class="fs-14  fs-sm-18 wow fadeInDown">@sort.Subname</p>
+    </div>
+</div>

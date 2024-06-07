@@ -1,0 +1,27 @@
+﻿@{
+    var contentList = ViewBag.ContentList as List<CmsContent>;
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+
+    @Html.Partial("_Position")
+
+    <!-- 图文列表 -->
+    <div class="row">
+        @foreach (var ca in contentList)
+        {
+            <div class="col-12 col-sm-6 col-lg-3 text-center">
+                <figure class="figure">
+                    <div class="card-img-200">
+                        <a href="@ca.Link"><img src="@ca.Ico" class="w-100" alt="@ca.Title"></a>
+                    </div>
+                    <figcaption class="figure-caption text-center lh-2"><a href="@ca.Link">@ca.Title.ShowLength(15)</a></figcaption>
+                </figure>
+            </div>
+        }
+    </div>
+
+    @Html.Partial("_Page")
+</div>

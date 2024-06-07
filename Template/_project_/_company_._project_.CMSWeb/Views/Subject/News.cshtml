@@ -1,0 +1,22 @@
+﻿@{
+    var content = ViewBag.Content as CmsContent;
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+
+    @Html.Partial("_Position")
+
+    @Html.Partial("_SortNav")
+
+    <h2 class="text-center fs-sm-28 fs-20 mt-3">@content.Title</h2>
+    <div class="text-center border-bottom text-secondary pb-2 mb-3">
+        时间：@content.Date.ToCurrentTime()&nbsp;&nbsp;&nbsp;访问量：@(content.Visits + 1000)
+    </div>
+    <div class="content mb-3">@Html.Raw(content.Content)</div>
+    <div class="text-secondary lh-2">
+        <p>上一篇：@Html.Raw(content.PreLink)</p>
+        <p>下一篇：@Html.Raw(content.NextLink)</p>
+    </div>
+</div>

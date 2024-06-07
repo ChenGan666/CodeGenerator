@@ -1,0 +1,277 @@
+﻿@{
+    int pageIndex = ViewBag.PageIndex;
+    int pageSize = ViewBag.PageSize;
+    int pageTotal = ViewBag.PageTotal;
+    int total = ViewBag.Total;
+    string keyword = ViewBag.Keyword;
+    string pageTitle = ViewBag.PageTitle;
+    var elist = ViewBag.EmployeeList as List<EmployeeInfo>;
+    var branchId = ViewBag.BranchID;
+    var departmentId = ViewBag.DepartmentID;
+    var jobPositionId = ViewBag.JobPositionID;
+    var bList = ViewBag.BranchList as List<BranchInfo>;
+    var dList = ViewBag.DepartmentList as List<DepartmentInfo>;
+    var JList = ViewBag.JobPositionList as List<JobPositionInfo>;
+
+    var dListJsonStr = ViewBag.DepartMentList != null ? JsonConvert.SerializeObject(ViewBag.DepartMentList) : JsonConvert.SerializeObject(new List<DepartmentInfo>());
+    var JListJsonStr = ViewBag.JobPositionList != null ? JsonConvert.SerializeObject(ViewBag.JobPositionList) : JsonConvert.SerializeObject(new List<JobPositionInfo>());
+
+}
+@functions {
+    public string IsDisabled()
+    {
+        if (!UserServiceHelper.CheckUserPermission("Employee/EmployeeStatus"))
+        {
+            return "disabled='disabled'";
+        }
+        return "";
+    }
+}
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>@pageTitle</legend>
+</fieldset>
+
+<div class="layui-row layui-form">
+    <button class="layui-btn" style="margin-right:50px;" onclick="AddClickEvent();"><i class="layui-icon"></i>增加</button>
+    @if (bList != null)
+    {<label>所属分支</label>
+        <div class="layui-input-inline layui-show-xs-block" style="margin-right:50px;">
+
+
+            <select name="BranchID" lay-verify="required" lay-filter="BranchID">
+                <option value="0">请选择</option>
+                @foreach (var b in bList)
+                {
+                    <option value="@b.BranchID" @(b.BranchID == branchId ? "selected" : "")>@b.bName</option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (dList != null)
+    {
+        <label>所属部门</label>
+        <div class="layui-input-inline layui-show-xs-block" style="margin-right:50px;">
+            <select name="DepartmentID" lay-verify="required" lay-filter="DepartmentID">
+                <option value="0">请选择</option>
+                @foreach (var d in dList)
+                {
+                    <option value="@d.DepartmentID" @(d.DepartmentID == departmentId ? "selected" : "")>@d.dName</option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (JList != null)
+    {
+        <label>所属岗位</label>
+        <div class="layui-input-inline layui-show-xs-block" style="margin-right:50px;">
+            <select name="JobPositionID" lay-verify="required" lay-filter="JobPositionID">
+                <option value="0">请选择</option>
+                @foreach (var j in JList)
+                {
+                    <option value="@j.JobPositionID" @(j.JobPositionID == jobPositionId ? "selected" : "")>@j.JPName</option>
+                }
+            </select>
+        </div>
+    }
+
+    <div class="layui-input-inline" style="width: 300px;">
+        <input type="text" name="keyword" value="@keyword" class="layui-input" placeholder="搜索人员">
+    </div>
+    <button class="layui-btn js-result-search">搜索</button>
+</div>
+
+<div class="layui-form">
+    <table class="layui-table">
+        <colgroup>
+            <col width="142">
+            <col width="142">
+            <col width="300">
+            <col width="300">
+            <col width="73">
+            <col width="280">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>分支名称</th>
+                <th>所属部门</th>
+                <th>所属岗位</th>
+                <th>人员</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in elist)
+            {
+                <tr data-bid="@e.EmployeeID">
+                    <td>@e.BranchName</td>
+                    <td>@e.DepartmentName</td>
+                    <td>@e.JPName</td>
+                    <td>@e.eName</td>
+                    <td>@e.eAppendTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <input @IsDisabled() type="checkbox" name="switch" lay-text="开启|停用" lay-skin="switch" lay-filter="status" @(e.eState ? "checked" : "")>
+                    </td>
+                    <td>
+                        <button class="layui-btn layui-btn layui-btn-xs" onclick="EditClickEvent(this);"><i class="layui-icon">&#xe642;</i>编辑</button>
+                        <button class="layui-btn-danger layui-btn layui-btn-xs" onclick="member_del(this)"><i class="layui-icon">&#xe640;</i>删除</button>
+                    </td>
+                </tr>
+            }
+            @if (elist.Count == 0)
+            {
+                <tr>
+                    <td colspan="6">暂无人员</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div id="pageId" class="pagination"></div>
+</div>
+
+@section Js{
+    <script>
+    var JList =@Html.Raw(JListJsonStr);
+    var dList =@Html.Raw(dListJsonStr);
+    var laypage = layui.laypage;
+    var pageIndex = @pageIndex;
+    var pageSize = @pageSize;
+    var pageTotal = @pageTotal;
+    var total = @total;
+    var keyword = encodeURIComponent('@keyword');
+
+    var BranchID =@branchId;
+    var DepartmentID =@departmentId;
+    var JobPositionID =@jobPositionId;
+    var form = layui.form;
+
+    form.render();
+
+    //执行一个laypage实例
+    laypage.render({
+          elem: 'pageId'
+        , count: total
+        , limit: pageSize
+        , curr: pageIndex
+        , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+        , jump: function (obj, f) {
+            if (f)
+                return;
+            location.href = "/Employee/EmployeeList?pageIndex=" + obj.curr + "&pageSize=" + obj.limit + "&keyword=" + keyword + "&branchID=" + BranchID + "&departmentID=" + DepartmentID + "&jobPositionID=" + JobPositionID;
+            }
+    });
+
+     /*用户-删除*/
+     function member_del(obj) {
+            layer.confirm('确认要删除吗？',
+                function (index) {
+
+                    //发异步删除数据
+                    var bid = $(obj).parents("tr").data('bid');
+                    dtajax({
+                        url: '@Url.Action("EmployeeDel")',
+                        type: 'POST',
+                        data: {
+                            employeeID: bid
+                        },
+                        success: function(res) {
+                            layer.msg('已删除!', { icon: 1, time: 1000 },function () {
+                                location.href = "/Employee/EmployeeList?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&keyword=" + $('input[name="keyword"]').val() + "&branchID=" + BranchID + "&departmentID=" + DepartmentID+"&jobPositionID=" + JobPositionID;
+                            });
+                        }
+                     });
+                });
+    }
+
+    form.on('switch(status)',
+            function (data) {
+                dtajax({
+                    url: '@Url.Action("EmployeeStatus")',
+                    type: 'POST',
+                    data: {
+                        employeeID: $(this).parents("tr").data('bid'),
+                        status: (this.checked ? 'true' : 'false')
+                    },
+                    success: function(res) {
+                        layer.msg('已修改', { icon: 1, time: 1000 });
+                    }
+            });
+
+       });
+
+        form.on('select(BranchID)', function (data) {
+            var branchId = data.value;
+            if (branchId > 0) {
+                $('select[name="DepartmentID"]').empty();
+                var _html = '';
+                for (var i = 0; i < dList.length; i++)  {
+                    if (dList[i].BranchID == branchId) {
+                        _html += '<option value="' + dList[i].DepartmentID + '">' + dList[i].dName + '</option>'
+                    }
+                }
+                $('select[name="DepartmentID"]').append($(_html));
+
+                $('select[name="JobPositionID"]').empty();
+                var shtml = '';
+                for (var i = 0; i < JList.length; i++) {
+                    if (JList[i].BranchID == branchId) {
+                        shtml += '<option value="' + JList[i].JobPositionID + '">' + JList[i].JPName + '</option>'
+                    }
+                }
+                $('select[name="JobPositionID"]').append($(shtml));
+                form.render('select');
+            }
+        });
+
+        form.on('select(DepartmentID)', function (data) {
+            var departmentId = data.value;
+            if (departmentId > 0) {
+                $('select[name="JobPositionID"]').empty();
+                var shtml = '';
+                for (var i = 0; i < JList.length; i++) {
+                    if (JList[i].DepartmentID == departmentId) {
+                        shtml += '<option value="' + JList[i].JobPositionID + '">' + JList[i].JPName + '</option>'
+                    }
+                }
+                $('select[name="JobPositionID"]').append($(shtml));
+                form.render('select');
+            }
+
+        });
+
+
+        $('.js-result-search').unbind().click(function () {
+            location.href = "/Employee/EmployeeList?pageIndex=" + 1 + "&pageSize=" + pageSize + "&keyword=" + $('input[name="keyword"]').val() + "&branchID=" + $('select[name="BranchID"]').val() + "&departmentID=" + $('select[name="DepartmentID"]').val()  + "&jobPositionID=" + $('select[name="JobPositionID"]').val();
+        });
+
+        /*新增*/
+        function AddClickEvent() {
+            var url = '@Url.Action("EmployeeEdit")';
+            $.post(url, null, function (result) {
+                if (result.status === false) {
+                    layer.msg(result.msg, { icon: 5, time: 2000 });
+                } else {
+                    xadmin.open('新增', url );
+                }
+            })
+        };
+
+        /*编辑*/
+          function EditClickEvent(obj) {
+              var employeeId = $(obj).parents("tr").data('bid');
+              var url = '@Url.Action("EmployeeEdit")' + "?employeeID=" + employeeId;
+              $.post(url,
+                  null,
+                  function(result) {
+                      if (result.status === false) {
+                          layer.msg(result.msg, { icon: 5, time: 2000 });
+                      } else {
+                          xadmin.open('编辑', url);
+                      }
+                  });
+          };
+    </script>
+}

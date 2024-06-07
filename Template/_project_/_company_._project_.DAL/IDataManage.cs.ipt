@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+
+using {Namespace}.Entity;
+
+namespace {Namespace}.DAL
+{
+    public partial interface I{ClassName}Manage
+    {
+
+        string SetConnectionName(string connName);
+        #region {TableName}
+
+        int {ClassName}_Add({ClassName} model);
+
+        bool {ClassName}_Update({ClassName} model);
+
+        bool {ClassName}_Delete({PKRow[CSharpType]} {PKName}); 
+
+        bool {ClassName}_DeleteList(string {PKName}list);
+
+        {ClassName} {ClassName}_DataRowToModel(DataRow row);
+
+        {ClassName} {ClassName}_GetModel({PKRow[CSharpType]} {PKName}); 
+
+        DataSet {ClassName}_GetList(string strWhere);
+
+        DataSet {ClassName}_GetList(int top, string strWhere, string filedOrder);
+
+        int {ClassName}_GetRecordCount(string strWhere);
+
+        DataSet {ClassName}_GetListByPage(string strWhere, string orderBy, int startIndex, int endIndex);
+
+        DataTable {ClassName}_GetListByPage(int pageSize, int pageIndex, string strWhere, out int pagetotal, out int total, int orderType, string showName, string orderKey);
+       
+        #endregion
+
+    }
+}

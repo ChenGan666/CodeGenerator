@@ -1,0 +1,28 @@
+﻿<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <title>@GlobalLabel.PageTitle</title>
+    <meta name="keywords" content="@GlobalLabel.PageKeywords">
+    <meta name="description" content="@GlobalLabel.PageDescription">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,shrink-to-fit=no">
+    <link rel="stylesheet" href="@GlobalLabel.SiteTplPath/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="@GlobalLabel.SiteTplPath/lib/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="@GlobalLabel.SiteTplPath/css/aoyun.css?v=v1.3.5">
+    <link rel="stylesheet" href="@GlobalLabel.SiteTplPath/lib/swiper-4.3.5/css/swiper.min.css">
+    <link rel="stylesheet" href="@GlobalLabel.SiteTplPath/css/animate.css">
+    <link rel="shortcut icon" href="@GlobalLabel.SitePath/favicon.ico" type="image/x-icon">
+    <script src="@GlobalLabel.SiteTplPath/js/jquery-1.12.4.min.js"></script>
+    @RenderSection("Css", false)
+</head>
+<body>
+
+    @Html.Partial("_Head")
+    
+    @RenderBody()
+    
+    @Html.Partial("_Foot")
+
+    @RenderSection("Js", false)
+</body>
+</html>

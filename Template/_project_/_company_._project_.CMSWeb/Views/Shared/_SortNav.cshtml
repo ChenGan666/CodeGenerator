@@ -1,0 +1,31 @@
+﻿@{
+    var currentSort = ContentSortHelper.CurrentSort;
+    var navList = ContentSortHelper.SortList.Where(t => t.Pcode == currentSort.Tcode).Take(10).ToList();
+}
+
+<!-- 分类导航 -->
+<div class="sonsort mt-4 mb-2">
+    @for(int i=0;i< navList.Count; i++)
+    {
+        var nav = navList[i];
+        if (i == 0)
+        {
+            if (currentSort.Scode == currentSort.Tcode)
+            {
+    <a href="@currentSort.TopSort.Link" class="btn btn-info mb-2">全部 <span class="badge badge-light">@currentSort.TopSort.Rows</span></a>
+            }
+            else
+            {
+    <a href="@currentSort.TopSort.Link" class="btn btn-light mb-2">全部 <span class="badge btn-info">@currentSort.TopSort.Rows</span></a>
+            }
+        }
+        if (nav.Scode == currentSort.Scode)
+        {
+    <a href="@nav.Link" class="btn btn-info mb-2">@nav.Name <span class="badge badge-light">@nav.Rows</span></a>
+        }
+        else
+        {
+    <a href="@nav.Link" class="btn btn-light mb-2">@nav.Name <span class="badge btn-info">@nav.Rows</span></a>
+        }
+    }
+</div>

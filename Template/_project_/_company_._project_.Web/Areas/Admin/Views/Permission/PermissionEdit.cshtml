@@ -1,0 +1,73 @@
+﻿@{
+    var permission = ViewBag.Pem as PermissionInfo;
+}
+
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@permission.PermissionID" name="PermissionID" />
+                <input type="hidden" value="@permission.ParentID" name="ParentID" />
+                <input type="hidden" value="@permission.pUpdateTime" name="pUpdateTime" />
+                <input type="hidden" value="@permission.pAppendTime" name="pAppendTime" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>权限名称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="PermissionName" lay-verify="required" value="@permission.PermissionName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        权限值
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="PermissionValue" value="@permission.PermissionValue"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否删除
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="IsDeleted" value="True" title="可删除" @(permission.IsDeleted ? "checked" : "")>
+                        <input type="radio" name="IsDeleted" value="False" title="不可删除" @(permission.IsDeleted ? "" : "checked")>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="IsUse" value="True" title="开启" @(permission.IsUse ? "checked" : "")>
+                        <input type="radio" name="IsUse" value="False" title="停用" @(permission.IsUse ? "" : "checked")>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var form = layui.form,
+            layer = layui.layer;
+        form.render();
+
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("PermissionSave")');
+
+    </script>
+}

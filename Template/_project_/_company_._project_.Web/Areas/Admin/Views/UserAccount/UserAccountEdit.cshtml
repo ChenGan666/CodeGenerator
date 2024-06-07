@@ -1,0 +1,172 @@
+﻿@{
+    var user = ViewBag.User as UserInfo;
+    var bList = ViewBag.BranchList as List<BranchInfo>;
+    var dList = ViewBag.DepartMentList as List<DepartmentInfo>;
+    var eList = ViewBag.EmployeeList as List<EmployeeInfo>;
+    var dListJsonStr = ViewBag.DepartMentList != null ? JsonConvert.SerializeObject(ViewBag.DepartMentList) : JsonConvert.SerializeObject(new List<DepartmentInfo>());
+    var eListJsonStr = ViewBag.EmployeeList != null ? JsonConvert.SerializeObject(ViewBag.EmployeeList) : JsonConvert.SerializeObject(new List<EmployeeInfo>());
+}
+
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@user.UserID" name="UserID" />
+                <input type="hidden" value="@user.SystemID" name="SystemID" />
+                <input type="hidden" value="@user.uLastIP" name="uLastIP" />
+                <input type="hidden" value="@user.uUpAppendTime" name="uUpAppendTime" />
+                <input type="hidden" value="@user.uType" name="uType" />
+                <input type="hidden" value="@user.uCode" name="uCode" />
+                <input type="hidden" value="@user.olTime" name="olTime" />
+                <input type="hidden" value="@user.uAppendTime" name="uAppendTime" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>所属分支
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (bList != null)
+                        {
+                            <select name="BranchID" lay-verify="required" lay-filter="BranchID">
+                                <option value="">请选择</option>
+                                @foreach (var b in bList)
+                                {
+                                    <option value="@b.BranchID"
+                                            @(b.BranchID== user.BranchID ? "selected":"")
+                                   >@b.bName</option>
+                                }
+                            </select>
+
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>所属部门
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (dList != null)
+                        {
+                            <select name="DepartmentID" lay-verify="required" lay-filter="DepartmentID">
+                                <option value="">请选择</option>
+
+                                @foreach (var d in dList)
+                                {
+                                    <option value="@d.DepartmentID"
+                                            @(d.DepartmentID == user.DepartmentID ? "selected" : "")>@d.dName</option>
+                                }
+
+                            </select>
+
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        账户
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="uName" lay-verify="required" value="@user.uName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        密码
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="password" lay-verify="required" name="uPWD"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>人员绑定
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (eList != null)
+                        {
+                            <select name="EmployeeID" lay-verify="required" lay-filter="EmployeeID">
+                                <option value="">请选择</option>
+
+                                @foreach (var e in eList)
+                                {
+                                    <option value="@e.EmployeeID" 
+                                            @(e.EmployeeID == user.EmployeeID ? "selected" : "")>@e.eName</option>
+                                }
+
+                            </select>
+
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="uState" value="True" title="开启" @(user.uState ? "checked" : "")>
+                        <input type="radio" name="uState" value="False" title="停用" @(user.uState ? "" : "checked")>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var dList =@Html.Raw(dListJsonStr);
+        var eList =@Html.Raw(eListJsonStr);
+        var form = layui.form,
+            layer = layui.layer;
+
+        form.render();
+
+        form.on('select(BranchID)', function (data) {
+            var branchId = data.value;
+            $('select[name="DepartmentID"]').empty();
+            var _html = '<option value="">请选择</option>';
+
+            for (var i = 0; i < dList.length; i++) {
+                if (dList[i].BranchID == branchId) {
+                    _html += '<option value="' + dList[i].DepartmentID + '">' + dList[i].dName + '</option>'
+                }
+            }
+            $('select[name="DepartmentID"]').append($(_html));
+            form.render('select');
+        });
+
+
+        form.on('select(DepartmentID)', function (data) {
+            var departmentId = data.value;
+            $('select[name="EmployeeID"]').empty();
+            var _html = '<option value="">请选择</option>';
+
+            for (var i = 0; i < eList.length; i++) {
+                if (eList[i].DepartmentID == departmentId) {
+                    _html += '<option value="' + eList[i].EmployeeID + '">' + eList[i].eName + '</option>'
+                }
+            }
+            $('select[name="EmployeeID"]').append($(_html));
+            form.render('select');
+        });
+
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("UserAccountSave")');
+    </script>
+}

@@ -42,13 +42,20 @@ namespace CodeGenerator
         {
             GetServerInfo();
             var db = new DbHelper { Server = DBServer.Current };
-            var dbNameList = db.GetAllDbName();
-            comboBox_Server_DBName.Items.Clear();
-            foreach (string dbName in dbNameList)
+            try
             {
-                comboBox_Server_DBName.Items.Add(dbName);
+                var dbNameList = db.GetAllDbName();
+                comboBox_Server_DBName.Items.Clear();
+                foreach (string dbName in dbNameList)
+                {
+                    comboBox_Server_DBName.Items.Add(dbName);
+                }
+                comboBox_Server_DBName.Text = dbNameList.FirstOrDefault();
             }
-            comboBox_Server_DBName.Text = dbNameList.FirstOrDefault();
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void FormLogin_FormClosed(object sender, FormClosedEventArgs e)

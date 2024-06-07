@@ -1,0 +1,139 @@
+﻿@{
+    var content = ViewBag.Content as CmsContent;
+    var constact = ContentSortHelper.SortList.FirstOrDefault(t => t.Scode == "11");
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+    
+    @Html.Partial("_Position")
+
+    <div class="row">
+        <div class="col-12 col-lg-6 mb-5">
+            <div class="view">
+                <a class="arrow-left" href="#"></a>
+                <a class="arrow-right" href="#"></a>
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img src="{content:ico}">
+                        </div>
+                        @foreach (var p in content.Pictures)
+                        {
+                            <div class="swiper-slide">
+                                <img src="@p">
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview mt-3">
+                <a class="arrow-left" href="#"></a>
+                <a class="arrow-right" href="#"></a>
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide active-nav swiper-slide-active">
+                            <img src="@content.Ico">
+                        </div>
+                        @foreach (var p in content.Pictures)
+                        {
+                            <div class="swiper-slide">
+                                <img src="@p">
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 mb-3 pr-3">
+            <h2 class="border-bottom pb-2 fs-sm-28 fs-20">{content:title}</h2>
+            <div class="text-secondary my-3 border-bottom-dashed lh-3">
+                上架时间：@content.Date.ToCurrentTime()
+            </div>
+            <div class="text-secondary my-3 border-bottom-dashed lh-3">
+                浏览次数：@content.Visits
+            </div>
+
+            <div class="text-secondary my-3 border-bottom-dashed lh-3">
+                产品类型：{content:ext_type}
+            </div>
+
+            <div class="text-secondary my-3 border-bottom-dashed lh-3">
+                产品颜色：{content:ext_color}
+            </div>
+            <div class="text-secondary my-3 border-bottom-dashed lh-3">
+                产品价格：￥{content:ext_price}
+            </div>
+            <div class="my-3 lh-3">
+                <a href="@constact.Link" class="btn btn-danger">马上咨询</a>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="border-bottom border-info pb-2 mb-2"><i class="fa fa-sliders" aria-hidden="true"></i> 产品详情</h5>
+    <div class="content">@Html.Raw(content.Content)</div>
+
+    <div class="text-secondary lh-2">
+        <p>上一篇：@Html.Raw(content.PreLink)</p>
+        <p>下一篇：@Html.Raw(content.NextLink)</p>
+    </div>
+</div>
+
+@section Js{
+
+    <script src="@GlobalLabel.SiteTplPath/lib/swiper-4.3.5/js/swiper.min.js"></script>
+    <script>
+        var viewSwiper = new Swiper('.view .swiper-container', {
+            on: {
+                slideChangeTransitionStart: function () {
+                    updateNavPosition();
+                }
+            }
+        });
+
+        $('.view .arrow-left,.preview .arrow-left').on('click', function (e) {
+            e.preventDefault()
+            if (viewSwiper.activeIndex == 0) {
+                viewSwiper.slideTo(viewSwiper.slides.length - 1, 1000);
+                return
+            }
+            viewSwiper.slidePrev();
+        });
+        $('.view .arrow-right,.preview .arrow-right').on('click',
+            function(e) {
+                e.preventDefault()
+                if (viewSwiper.activeIndex == viewSwiper.slides.length - 1) {
+                    viewSwiper.slideTo(0, 1000);
+                    return;
+                }
+                viewSwiper.slideNext();
+            });
+
+        var previewSwiper = new Swiper('.preview .swiper-container', {
+            //visibilityFullFit: true,
+            slidesPerView: 'auto',
+            allowTouchMove: false,
+            on: {
+                tap: function () {
+                    viewSwiper.slideTo(previewSwiper.clickedIndex);
+                }
+            }
+        });
+
+        function updateNavPosition() {
+            $('.preview .active-nav').removeClass('active-nav')
+            var activeNav = $('.preview .swiper-slide').eq(viewSwiper.activeIndex).addClass('active-nav')
+            if (!activeNav.hasClass('swiper-slide-visible')) {
+                if (activeNav.index() > previewSwiper.activeIndex) {
+                    var thumbsPerNav = Math.floor(previewSwiper.width / activeNav.width()) - 1;
+                    previewSwiper.slideTo(activeNav.index() - thumbsPerNav);
+                } else {
+                    previewSwiper.slideTo(activeNav.index());
+                }
+            }
+        }
+    </script>
+}

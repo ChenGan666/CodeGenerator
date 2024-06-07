@@ -1,0 +1,89 @@
+﻿@{
+    var dic = ViewBag.Dic as DictionaryInfo;
+}
+
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@dic.DicId" name="DicId" />
+                <input type="hidden" value="@dic.Pid" name="Pid" />
+                <input type="hidden" value="@dic.Cid" name="Cid" />
+                <input type="hidden" value="@dic.CreateTime" name="CreateTime" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>字典名称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="DicName" lay-verify="required" value="@dic.DicName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        字典Title
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="DicTitle" value="@dic.DicTitle"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        字典值
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="DicValue" value="@dic.DicValue"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        字典备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="DicRemark" value="@dic.DicRemark"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="Status" value="True" title="开启" @(dic.Status ? "checked" : "")>
+                        <input type="radio" name="Status" value="False" title="停用" @(dic.Status ? "" : "checked")>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        排序
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="Sort" value="@dic.Sort" lay-verify="number"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var form = layui.form,
+            layer = layui.layer;
+        form.render();
+
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("DictionarySave")');
+      
+    </script>
+}

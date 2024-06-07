@@ -1,0 +1,151 @@
+﻿@{
+    // 轮播
+    var slideList = ViewBag.SlideList as List<CmsSlide>;
+    var gid = 1;
+    var pageSize = 5;
+    slideList = slideList.Where(t => t.Gid == gid).OrderBy(t => t.Sorting).Take(pageSize).ToList();
+    // 栏目
+    var sortList = ViewBag.SortList as List<CmsContentSort>;
+    // 内容
+    var contentList = ViewBag.ContentList as List<CmsContent>;
+    var content = ViewBag.Content as CmsContent;
+    // 新闻
+    var newsList = ViewBag.NewsList as List<CmsContent>;
+
+    var psort = sortList.FirstOrDefault(t => t.Scode == "5");
+    var asort = sortList.FirstOrDefault(t => t.Scode == "1");
+    var nsort = sortList.FirstOrDefault(t => t.Scode == "2");
+}
+
+<!-- 幻灯片 -->
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        @foreach (var slide in slideList)
+        {
+            <div class="swiper-slide">
+                <a href="@slide.Link">
+                    <img src="@slide.Pic" class="d-block w-100" />
+                </a>
+                <div class="container">
+                    <div class="position-absolute text-light" style="top:30%;">
+                        <h1 class="fs-20 fs-sm-32 wow slideInUp">@slide.Title</h1>
+                        <h4 class="fs-14 fs-sm-20 wow slideInUp">@slide.Subtitle</h4>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="swiper-button-prev d-none d-md-block"></div><!--左箭头-->
+    <div class="swiper-button-next d-none d-md-block"></div><!--右箭头-->
+    <div class="swiper-pagination"></div>
+</div>
+
+<!--产品推荐-->
+<div class="bg-white py-5">
+    <div class="container">
+
+        <div class="text-center fs-26 fs-sm-28 text-success wow fadeInDown">@psort.Name</div>
+        <div class="text-center fs-14 fs-sm-16 mb-4 text-secondary wow fadeInUp" data-wow-delay="1s">- @psort.Subname -</div>
+
+        <div class="row">
+            @for (int i = 0; i < contentList.Count; i++)
+            {
+                var c = contentList[i];
+                <div class="col-12 col-sm-6 col-lg-3 wow zoomIn" data-wow-delay="@(i+1)00ms" data-wow-duration="1s">
+                    <div class="card">
+                        <div class="card-img-150"><a href="@c.Link"><img class="card-img-top" src="@c.Ico" alt="@c.Title"></a></div>
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="@c.Link">@c.Title.ShowLength(12)</a></h5>
+                            <p class="card-text">
+                                @if (c.Istop == "1")
+                                {
+                                    <span class="badge badge-danger">置顶</span>
+                                }
+                                else if (c.Isrecommend == "1")
+                                {
+                                    <span class="badge badge-warning">推荐</span>
+                                }
+                                else if (c.Isheadline == "1")
+                                {
+                                    <span class="badge badge-info">头条</span>
+                                }
+                                @c.Content.RemoveHtmlTags().RemoveBlank().ShowLength(49)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-4 wow fadeInDown" data-wow-delay="1s">
+            <h4><a href="@psort.Link" class="text-secondary fs-14 fs-sm-16">查看更多</a></h4>
+        </div>
+    </div>
+</div>
+
+<!-- 关于我们 -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="text-center fs-26 fs-sm-28 text-info wow fadeInDown">@asort.Name</div>
+        <div class="text-center fs-14 fs-sm-16 mb-4 text-secondary wow fadeInUp" data-wow-delay="1s">- @asort.Subname -</div>
+
+        <div class="row text-secondary mb-5 px-3 lh-2 wow fadeInDown" data-wow-delay="500ms" style="text-indent:30px;">
+            @content.Content.RemoveHtmlTags().RemoveBlank().ShowLength(454, "")
+        </div>
+        <div class="text-center wow fadeInDown" data-wow-delay="1s"><h4><a href="@content.Link" class="text-secondary fs-14 fs-sm-16">查看更多</a></h4></div>
+    </div>
+</div>
+
+<!-- 新闻动态 -->
+<div class="bg-white py-5">
+    <div class="container">
+
+        <div class="text-center fs-26 fs-sm-28 text-warning wow fadeInDown">@nsort.Name</div>
+        <div class="text-center fs-14 fs-sm-16 mb-5 text-secondary wow fadeInUp" data-wow-delay="1s">- @nsort.Subname -</div>
+
+        <div class="row">
+            @foreach (var news in newsList)
+            {
+                <div class="col-12 col-lg-6 mb-3 wow fadeInUp" data-wow-delay="500ms">
+                    <div class="media mb-3">
+                        <div class="media-body">
+                            <h5><a href="@news.Link" title="[list:title]">@news.Title.ShowLength(21)</a></h5>
+                            <p><a href="@news.Link" class="text-secondary lh-2">@news.Content.RemoveHtmlTags().RemoveBlank().ShowLength(60) @news.Date.ToString("yyyy-MM-dd")</a></p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center wow fadeInDown" data-wow-delay="1s"><h4><a href="@nsort.Link" class="text-secondary fs-14 fs-sm-16">查看更多</a></h4></div>
+
+    </div>
+</div>
+
+@section Js{
+    <script src="@GlobalLabel.SiteTplPath/lib/swiper-4.3.5/js/swiper.min.js"></script>
+    <script>
+        var mySwiper = new Swiper('.swiper-container',
+            {
+                direction: 'horizontal',
+                loop: true,
+                speed: 1500,
+                autoplay: {
+                    delay: 3500,
+                    disableOnInteraction: false
+                },
+
+                // 如果需要分页器
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+
+                // 如果需要前进后退按钮
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            })
+    </script>
+}

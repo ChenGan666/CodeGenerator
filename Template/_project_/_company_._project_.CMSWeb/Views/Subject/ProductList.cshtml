@@ -1,0 +1,85 @@
+﻿@{
+    var contentList = ViewBag.ContentList as List<CmsContent>;
+    var extList = CmsExtfieldBussiness.GetList("type='4'");
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+
+    @Html.Partial("_Position")
+
+    <!-- 分类筛选 -->
+    <div class="my-3">
+
+        @foreach (var ext in extList)
+        {
+        <div class="row">
+            <div class="col-12 col-sm-2 col-md-1">@ext.Description：</div>
+            <div class="col-12 col-sm-10 col-md-11">
+                <a href="javascript:;" class="mb-3 btn @("" == GlobalLabel.GetParameter(ext.Name) ? "btn-info" : "btn-light") js-product-exts" data-value="" data-ext="@ext.Name">全部</a>
+                @foreach (var tag in ext.Value.Split(','))
+                    {
+                <a href="javascript:;" class="mb-3 btn @(tag == GlobalLabel.GetParameter(ext.Name) ? "btn-info" : "btn-light") js-product-exts" data-value="@tag" data-ext="@ext.Name">@tag</a>
+                    }
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- 图文列表 -->
+    <div class="row">
+        @for (int i = 0; i < contentList.Count; i++)
+        {
+            var p = contentList[i];
+        <div class="col-12 col-sm-6 col-lg-3 wow zoomIn" data-wow-delay="@(i + 1)00ms" data-wow-duration="1s">
+            <div class="card">
+                <div class="card-img-150"><a href="@p.Link"><img class="card-img-top" src="@p.Ico" alt="@p.Title"></a></div>
+                <div class="card-body">
+                    <h5 class="card-title"><a href="@p.Link">@p.Title.ShowLength(12)</a></h5>
+                    <p class="card-text">
+                        @if (p.Istop == "1")
+                            {
+                        <span class="badge badge-danger">置顶</span>
+                            }
+                        @if (p.Isrecommend == "1")
+                            {
+                        <span class="badge badge-warning">推荐</span>
+                            }
+                        @if (p.Isheadline == "1")
+                            {
+                        <span class="badge badge-info">头条</span>
+                            }
+                        @Html.Raw(p.Content.RemoveHtmlTags().RemoveBlank().ShowLength(55))
+                    </p>
+                    <p>
+                        @*{pboot:tags id=[list:id] scode={sort:tcode}}
+                            <a href="[tags:link]"><span class="badge badge-secondary">[tags:text]</span></a>
+                            {/pboot:tags}*@
+                    </p>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    @Html.Partial("_Page")
+
+    <!-- 搜索-->
+    <form class="form-inline mb-5 justify-content-center" action="@GlobalLabel.SearchAction" method="get">
+        <div class="form-group mx-sm-3 mb-2">
+            <input type="text" name="keyword" class="form-control" placeholder="请输入关键字">
+        </div>
+        <button type="submit" class="btn btn-info mb-2">搜索</button>
+    </form>
+
+</div>
+
+@section Js{
+    <script>
+        $(".js-product-exts").unbind().click(function() {
+            var baseUrl = "@GlobalLabel.PageUrl";
+             
+        });
+    </script>
+}

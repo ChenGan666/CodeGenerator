@@ -1,0 +1,226 @@
+﻿@{
+    var jobPosition = ViewBag.Bac as JobPositionInfo;
+    var bList = ViewBag.BranchList as List<BranchInfo>;
+    var dList = ViewBag.DepartMentList as List<DepartmentInfo>;
+    var dListJsonStr = ViewBag.DepartMentList != null ? JsonConvert.SerializeObject(ViewBag.DepartMentList) : JsonConvert.SerializeObject(new List<DepartmentInfo>());
+    string jpPermissionList = ViewBag.JPPermissionList != null ? JsonConvert.SerializeObject(ViewBag.JPPermissionList) : JsonConvert.SerializeObject(new List<LayuiTreeData>()); ;
+}
+
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@jobPosition.JobPositionID" name="JobPositionID" />
+                <input type="hidden" value="@jobPosition.SystemID" name="SystemID" />
+                <input type="hidden" value="@jobPosition.JPItemID" name="JPItemID" />
+                <input type="hidden" value="@jobPosition.BranchName" name="BranchName" />
+                <input type="hidden" value="@jobPosition.DepartmentName" name="DepartmentName" />
+                <input type="hidden" value="@jobPosition.JPPermissions" name="JPPermissions" />
+                <input type="hidden" value="@jobPosition.JPAppendTime" name="JPAppendTime" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>所属分支
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (bList != null)
+                        {
+                            <select name="BranchID" lay-verify="required" lay-filter="BranchID">
+                                <option value="">请选择</option>
+                                @foreach (var b in bList)
+                                {
+                                    <option value="@b.BranchID" @(b.BranchID == jobPosition.BranchID ? "selected" : "")>@b.bName</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>所属部门
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (dList != null)
+                        {
+                            <select name="DepartmentID" lay-verify="required" lay-filter="DepartmentID">
+                                <option value="">请选择</option>
+                                @foreach (var d in dList)
+                                {
+                                    <option value="@d.DepartmentID" @(d.DepartmentID == jobPosition.DepartmentID ? "selected" : "")>@d.dName</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        岗位名称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="JPName" lay-verify="required" value="@jobPosition.JPName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        岗位级别
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="number" name="JobLevel" value="@jobPosition.JobLevel"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="JPRemark" value="@jobPosition.JPRemark"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        权限
+                    </label>
+                    <ul id="JPPermissions-Tree" class="ztree layui-input-inline"></ul>
+
+                </div>
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="JState" value="True" title="开启" @(jobPosition.JState ? "checked" : "")>
+                        <input type="radio" name="JState" value="False" title="停用" @(jobPosition.JState ? "" : "checked")>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+
+                    <a class="layui-btn save-permission-bt">保存权限</a>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var dList =@Html.Raw(dListJsonStr);
+        var TreeData =@Html.Raw(jpPermissionList.Replace("Checked","checked"));
+        var form = layui.form,
+            layer = layui.layer;
+        form.render();
+        form.on('select(BranchID)', function (data) {
+            var branchId = data.value;
+            $('select[name="DepartmentID"]').empty();
+            var _html = '<option value="">请选择</option>';
+
+            for (var i = 0; i < dList.length; i++) {
+                if (dList[i].BranchID == branchId) {
+                    _html += '<option value="' + dList[i].DepartmentID + '">' + dList[i].dName + '</option>'
+                }
+            }
+            $('select[name="DepartmentID"]').append($(_html));
+            form.render('select');
+            $('input[name="BranchName"]').val($('select[name="BranchID"] option:selected').text());
+        });
+        form.on('select(DepartmentID)', function (data) {
+            var departmentName = data.value != '' ? $(data.elem).find('option:selected').text() : '';
+            $('input[name="DepartmentName"]').val(departmentName);
+        });
+        //权限树
+        /*
+        layui.use(['tree', 'util'],  function (e) {
+            var tree = layui.tree;
+            var util = layui.util;
+            //渲染
+            //开启复选框
+            var JPPermissionsTree = tree.render({
+                elem: '#JPPermissions-Tree'
+                , id: 'demoId'
+                , data: TreeData
+                , showCheckbox: true
+                , oncheck: function (obj) {
+                   // var checkedData = JPPermissionsTree.getChecked();
+                   // MakeJPPermissionsHiddenVal(checkedData);
+                }
+            });
+            //按钮事件
+            util.event('lay-demo', {
+                getChecked: function (othis) {
+                    var checkedData = JPPermissionsTree.getChecked(); //获取选中节点的数据
+                    MakeJPPermissionsHiddenVal(checkedData);
+                    alert("权限保存成功");
+                }
+            });
+        });
+        */
+        //layui zree的值
+        function MakeJPPermissionsHiddenVal(checkedData)
+        {
+            var PermissiomIDArr = [];
+            PermissionsLoopCheckData(checkedData, PermissiomIDArr)
+            $('input[name="JPPermissions"]').val(PermissiomIDArr.join(','));
+        }
+        function PermissionsLoopCheckData(checkedData,PermissiomIDArr)
+        {
+            for (var i = 0; i < checkedData.length; i++) {
+                PermissiomIDArr.push(checkedData[i].id);
+                if (checkedData[i].children.length > 0) {
+                    PermissionsLoopCheckData(checkedData[i].children, PermissiomIDArr);
+                }
+            }
+        }
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("JobPositionSave")');
+
+    </script>
+    <link rel="stylesheet" href="~/pulgs/ztree/css/zTreeStyle.css" type="text/css">
+    <script type="text/javascript" src="~/pulgs/ztree/js/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="~/pulgs/ztree/js/jquery.ztree.all.js"></script>
+    <script>
+        var zTreeObj;
+        // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+        var settingss = {
+            check: {
+                enable: true
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            }
+        };
+        // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
+        var zNodes = TreeData;
+        $(document).ready(function () {
+            zTreeObj = $.fn.zTree.init($("#JPPermissions-Tree"), settingss, zNodes);
+        });
+        // 刷新权限hidden val事件
+        $('.save-permission-bt').click(function () {
+            var checkedNodes = zTreeObj.getCheckedNodes();
+            MakeJPPermissionsHiddenValByZtree(checkedNodes);
+            layer.msg('保存权限值成功!');
+        });
+        function MakeJPPermissionsHiddenValByZtree(checkedNodes) {
+            var PermissionsIdArr = [];
+            for (var i = 0; i < checkedNodes.length; i++) {
+                PermissionsIdArr.push(checkedNodes[i].id);
+            }
+            $('input[name="JPPermissions"]').val(PermissionsIdArr.join(','));
+        }
+    </script>
+}

@@ -1,0 +1,14 @@
+﻿@{
+    var contentList = ViewBag.ContentList as List<CmsContent>;
+    var content = contentList.LastOrDefault();
+}
+
+@Html.Partial("_Top")
+
+<div class="container pages">
+
+    @Html.Partial("_Position")
+
+    <h2 class="text-center my-4 fs-sm-28 fs-24">@content?.Title</h2>
+    <div class="content">@Html.Raw(content?.Content)</div>
+</div>

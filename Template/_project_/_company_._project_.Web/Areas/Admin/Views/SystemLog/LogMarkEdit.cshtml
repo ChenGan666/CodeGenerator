@@ -1,0 +1,92 @@
+﻿@{
+    var LogT = ViewBag.LogT as LogMark;
+    var LogLevelList = ViewBag.LogLevelList as List<LogLevel>;
+ 
+    
+}
+
+<div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form">
+                <input type="hidden" value="@LogT.Id" name="Id" />
+                <input type="hidden" value="@LogT.ClassId" name="ClassId" />
+                <input type="hidden" value="@LogT.CreateTime" name="CreateTime" />
+                <input type="hidden" value="@LogT.UpdateTime" name="UpdateTime" />
+
+
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        日志类型名称
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="MarkName" lay-verify="required" value="@LogT.MarkName"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>日志等级
+                    </label>
+                    <div class="layui-input-inline layui-show-xs-block">
+                        @if (LogLevelList != null)
+                        {
+                            <select name="LogLevelID" lay-verify="required" lay-filter="LogLevelID">
+                                <option value="">请选择</option>
+                                @foreach (var l in LogLevelList)
+                                {
+                                   <option value="@l.Id" @(l.Id == LogT.LevelId ? "selected" : "")>@l.LevelName</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        备注
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="MarkRemarks" value="@LogT.MarkRemarks"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                        是否启用
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="Status" value="True" title="开启" @(LogT.Status ? "checked" : "")>
+                        <input type="radio" name="Status" value="False" title="停用" @(LogT.Status ? "" : "checked")>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <button class="layui-btn" lay-filter="save" lay-submit>
+                        保存
+                    </button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Js
+{
+    <script>
+        var form = layui.form,
+            layer = layui.layer;
+        form.render();
+       
+        //监听提交
+        Common.formAutoSave(form, '@Url.Action("LogMarkSave")');
+    </script>
+}
