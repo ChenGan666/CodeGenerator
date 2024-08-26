@@ -58,6 +58,8 @@ namespace CodeGenerator
             CheckTemplate();
             CheckServerLogin();
             textBox_ConnectionName.Text = ConfigHelper.GetString("DefaultConnectionName");
+            textBox_pre.Text = ConfigHelper.GetString("DefaultTableTag");
+
             textBox_Company.Text = ConfigHelper.GetString("DefaultCompany");
             textBox_Project.Text = ConfigHelper.GetString("DefaultProject");
             textBox_BuildPath.Text = ConfigHelper.GetString("DefaultBuildPath");
@@ -287,6 +289,14 @@ namespace CodeGenerator
             _buildPath = Path.Combine(textBox_BuildPath.Text.Trim(), _project);
             DeleteDirectory(_buildPath);
             Directory.CreateDirectory(_buildPath);
+
+            
+            ConfigHelper.SetString("DefaultConnectionName", textBox_ConnectionName.Text);
+            ConfigHelper.SetString("DefaultCompany", textBox_Company.Text);
+            ConfigHelper.SetString("DefaultProject", textBox_Project.Text);
+            ConfigHelper.SetString("DefaultBuildPath", textBox_BuildPath.Text);
+            ConfigHelper.SetString("DefaultTableTag", textBox_pre.Text);
+
 
             if (checkedListBox_template.CheckedItems.Count == 0)
             {
@@ -699,21 +709,25 @@ namespace CodeGenerator
 
             if (templateFileStr.Trim() != "")
             {
+                List<string> _x = new List<string>();
+                _x.Skip(1).ToList();
                 // 创建一个C#语法树
                 SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(templateFileStr);
 
                 // 引用必要的元数据
                 MetadataReference[] references = new MetadataReference[]
                 {
-
-                MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(SqlConnection).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(DataRowExtensions).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(XmlDocument).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Form).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(File).GetTypeInfo().Assembly.Location), // System.IO
+                    MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(SqlConnection).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(DataRowExtensions).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(XmlDocument).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Form).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(File).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Runtime")).Location),
+                    MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Collections")).Location)
+                    
 
                 };
 

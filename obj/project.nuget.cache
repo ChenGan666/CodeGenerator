@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9bFTxIpXYs4LzsyVJ6/54+Yv87K97PyQihu+KwFkkTzjuhMqFi6VgSAKc4KMtxH0wCl2DowJwZgj36TW63xf8A==",
+  "dgSpecHash": "UqtqAy/lA3M=",
   "success": true,
-  "projectFilePath": "\\\\Mac\\Dev\\app\\ZSN\\CodeGenerator\\CodeGenerator.csproj",
+  "projectFilePath": "W:\\app\\ZSN\\CodeGenerator\\CodeGenerator.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chengan\\.nuget\\packages\\anglesharp\\1.1.2\\anglesharp.1.1.2.nupkg.sha512",
     "C:\\Users\\chengan\\.nuget\\packages\\bouncycastle.cryptography\\2.2.1\\bouncycastle.cryptography.2.2.1.nupkg.sha512",

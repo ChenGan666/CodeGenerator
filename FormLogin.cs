@@ -36,6 +36,11 @@ namespace CodeGenerator
             server.ServerPwd = textBox_Server_PWD.Text.Trim();
             server.ServerType = comboBox_ServerType.Text.Trim();
             server.ServerDbName = comboBox_Server_DBName.Text.Trim();
+
+            ConfigHelper.SetString("DefaultServerIp", textBox_Server_IP.Text.Trim());
+            ConfigHelper.SetString("DefaultServerUser", textBox_Server_User.Text.Trim());
+            ConfigHelper.SetString("DefaultServerPwd", textBox_Server_PWD.Text.Trim());
+            ConfigHelper.SetString("DefaultServerType", comboBox_ServerType.Text.Trim());
         }
 
         private void button1_Click(object sender, EventArgs e)

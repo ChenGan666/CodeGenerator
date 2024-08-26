@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Google.Protobuf.WellKnownTypes;
+using System;
 using System.Configuration;
+using static Mysqlx.Expect.Open.Types.Condition.Types;
 
 namespace ZNS.CodeGenerator.Utils
 {
@@ -22,6 +24,22 @@ namespace ZNS.CodeGenerator.Utils
         public static int GetInt(string configStr, int defaultInt = -1)
         {
             return Convert.ToInt32(ConfigurationManager.AppSettings[configStr] ?? defaultInt.ToString());
+        }
+
+        public static void SetString(string configStr, string defaultStr = "") {
+
+            var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var settings = configFile.AppSettings.Settings;
+            if (settings[configStr] == null)
+            {
+                settings.Add(configStr, defaultStr);
+            }
+            else
+            {
+                settings[configStr].Value = defaultStr;
+            }
+            configFile.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
         }
     }
 }

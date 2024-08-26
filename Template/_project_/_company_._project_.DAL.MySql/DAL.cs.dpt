@@ -139,6 +139,10 @@ namespace {Namespace}.DAL.MySql
         ///添加用表字段value
         private const string {ClassName}TableFieldAltForAdd = "{FieldStrAtForAdd}";
 
+        public string SetConnectionName(string connName)
+        {
+            return {ClassName}ConnectionName = connName;
+        }
 
 		/// <summary>
         /// 增加一条数据
