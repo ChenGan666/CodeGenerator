@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "W:\\app\\ZSN\\CodeGenerator\\",
+  "WorkspaceRootPath": "W:\\APP\\ZSN\\CodeGenerator\\",
   "Documents": [
     {
       "AbsoluteMoniker": "D:0:0:{A7D6F5CC-C520-4F60-A5A7-9D8EE244451A}|CodeGenerator.csproj|w:\\app\\zsn\\codegenerator\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -24,14 +24,24 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "FormMain.cs",
-              "DocumentMoniker": "W:\\app\\ZSN\\CodeGenerator\\FormMain.cs",
+              "DocumentMoniker": "W:\\APP\\ZSN\\CodeGenerator\\FormMain.cs",
               "RelativeDocumentMoniker": "FormMain.cs",
-              "ToolTip": "W:\\app\\ZSN\\CodeGenerator\\FormMain.cs",
+              "ToolTip": "W:\\APP\\ZSN\\CodeGenerator\\FormMain.cs",
               "RelativeToolTip": "FormMain.cs",
-              "ViewState": "AQIAAOECAAAAzczMzMwkwPICAABHAAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-08-02T05:44:44.36Z",
               "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1856,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         }
